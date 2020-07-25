@@ -33,60 +33,56 @@ func main() {
 	}
 
 	messageURL := queueURL.NewMessagesURL()
-	for {
-		props, err := queueURL.GetProperties(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("1: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
-		visibleCount, err := getVisibleCount(&messageURL, 32)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("2: Visible count of messages in the queue=%d\n", visibleCount)
-		dequeue, err := messageURL.Dequeue(ctx, 1, 30*time.Second)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if dequeue.NumMessages() == 0 {
-			time.Sleep(time.Second * 10)
-		} else {
-			for m := int32(0); m < dequeue.NumMessages(); m++ {
 
-				message := dequeue.Message(m)
-				// txt, err := base64.StdEncoding.DecodeString(message.Text)
-
-				fmt.Printf("3: Dequeue [%s] : Message: %s\n", message.InsertionTime.Format("2009-11-10 23:00:00 +0000 UTC"), message.Text)
-				props, err = queueURL.GetProperties(ctx)
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Printf("4: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
-				visibleCount, err = getVisibleCount(&messageURL, 32)
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Printf("5: Visible count of messages in the queue=%d\n", visibleCount)
-				msgIDURL := messageURL.NewMessageIDURL(message.ID)
-				_, err = msgIDURL.Delete(ctx, message.PopReceipt)
-				fmt.Printf("6: Delete message %v\n", message.ID)
-				if err != nil {
-					log.Fatal(err)
-				}
-				props, err = queueURL.GetProperties(ctx)
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Printf("7: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
-				visibleCount, err = getVisibleCount(&messageURL, 32)
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Printf("8: Visible count of messages in the queue=%d\n", visibleCount)
-			}
-			return
-		}
+	props, err := queueURL.GetProperties(ctx)
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Printf("1: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
+	visibleCount, err := getVisibleCount(&messageURL, 32)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("2: Visible count of messages in the queue=%d\n", visibleCount)
+	dequeue, err := messageURL.Dequeue(ctx, 1, 30*time.Second)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for m := int32(0); m < dequeue.NumMessages(); m++ {
+
+		message := dequeue.Message(m)
+		// txt, err := base64.StdEncoding.DecodeString(message.Text)
+
+		fmt.Printf("3: Dequeue [%s] : Message: %s\n", message.InsertionTime.Format("2009-11-10 23:00:00 +0000 UTC"), message.Text)
+		props, err = queueURL.GetProperties(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("4: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
+		visibleCount, err = getVisibleCount(&messageURL, 32)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("5: Visible count of messages in the queue=%d\n", visibleCount)
+		msgIDURL := messageURL.NewMessageIDURL(message.ID)
+		_, err = msgIDURL.Delete(ctx, message.PopReceipt)
+		fmt.Printf("6: Delete message %v\n", message.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		props, err = queueURL.GetProperties(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("7: Approximate number of messages in the queue=%d\n", props.ApproximateMessagesCount())
+		visibleCount, err = getVisibleCount(&messageURL, 32)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("8: Visible count of messages in the queue=%d\n", visibleCount)
+	}
+	return
 }
 
 func getVisibleCount(messagesURL *azqueue.MessagesURL, maxCount int32) (int32, error) {

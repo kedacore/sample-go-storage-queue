@@ -17,7 +17,7 @@ import (
 func main() {
 	fmt.Println("Azure Strage Queue Sender")
 	connectionString := os.Getenv("ConnectionString")
-	queueName := os.Getenv("QueueName")
+	queueName := os.Getenv("queueName")
 	if len(os.Args) != 2 {
 		log.Fatalf("Specify the counter parameter. e.g. send 100 Parameter length: %d\n", len(os.Args))
 	}
