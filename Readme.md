@@ -1,20 +1,21 @@
-# Azure Storage Queue SDK for GO sample 
+# KEDA Azure Storage Queue Trigger Samples
 
-Sample program for sending/receiving queue. 
+Sample program for sending/receiving queue and KEDA v2 Azure Storage Queue Trigger. 
 
 # How to run the sample
 
 ## Prerequisite
-Install Go lang (1.13+)
+* Install Go lang (1.13+)
+* Docker
 
-## Set Enviornment Variables
+## Set Enviornment Variables for the container
 
 | Key | Description |
 | ---- | ------ |
 | ConnectionString | The Connection String for the Azure Storage Account |
-| QueueName | The name of the queue |
+| queueName | The name of the queue |
 
-## Run 
+## Run queue receiver/sender
 
 ### receiver
 
@@ -60,4 +61,30 @@ It requires, VSCode [Go extension](https://marketplace.visualstudio.com/items?it
         }
     ]
 }
+```
+
+## Run with KEDA
+
+### Prerequisite
+KEDA v2 is deployed already. 
+You have a kubernetes cluster and configured with kubectl. 
+
+### Start the ScaledJob
+
+#### Copy deploy-consumer-job.yaml.example to deploy-consumer-job.yaml
+Modify `YOUR_BASE64_CONNECTION_STRING_HERE` as your Storage Account Connection String with Base64 encoded. 
+
+Then Apply it. This will create a secret, ScaledJob with Storage Queue Trigger.
+
+```
+$ kubectl apply -f deploy/deploy-consumer-job.yaml
+```
+
+Send queue to the target queue. You can do it with the `send` command. This command will send 3 messages with cleaning up existing messages.
+
+```
+$ cd cmd/send
+$ export ConnectionString="YOUR_CONNECTION_STRING_HERE"
+$ export queueName=hello
+$ go run send.go 3
 ```
