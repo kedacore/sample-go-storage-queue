@@ -16,7 +16,9 @@ import (
 func main() {
 	fmt.Println("Azure Strage Queue Receiver")
 	connectionString := os.Getenv("ConnectionString")
-	queueName := os.Getenv("QueueName")
+	queueName := os.Getenv("queueName")
+	fmt.Printf("ConnectionString: '%s'\n", connectionString)
+	fmt.Printf("QueueName: '%s'\n", queueName)
 	credential, endpoint, err := parseAzureStorageConnectionString(connectionString)
 	if err != nil {
 		log.Fatalf("%s: %s", "Invalid ConnectionString", err)
@@ -82,7 +84,7 @@ func main() {
 				}
 				fmt.Printf("8: Visible count of messages in the queue=%d\n", visibleCount)
 			}
-			// return
+			return
 		}
 	}
 }

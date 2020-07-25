@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: azure-storage-queue-secret
+data:
+  ConnectionString: YOUR_BASE64_CONNECTION_STRING_HERE
+  queueName: aGVsbG8=
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: azure-storage-queue-consumer
+  namespace: default
+spec:
+  jobTargetRef:
+    template:
+      spec:
+        containers:
+        - name: azure-storage-queue-receive
+          image: tsuyoshiushio/azure-storage-queue-client:dev
+          imagePullPolicy: Always
+          command: ["receive"]
+          envFrom:
+            - secretRef:
+                name: azure-storage-queue-secret
+        restartPolicy: Never
+    backoffLimit: 4  
+  pollingInterval: 5   # Optional. Default: 30 seconds
+  cooldownPeriod: 30   # Optional. Default: 300 seconds
+  maxReplicaCount: 30  # Optional. Default: 100
+  triggers:
+  - type: azure-queue
+    authenticationRef:
+      name: azure-queue-auth
+    metadata:
+      queueName: "hello"
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: azure-queue-auth
+spec:
+  secretTargetRef:
+  - parameter: connection
+    name: azure-storage-queue-secret
+    key: ConnectionString

@@ -1,4 +1,4 @@
-module github.com/TsuyoshiUshio/sample-go-storage-queue
+module github.com/kedacore/sample-go-storage-queue
 
 go 1.13
 
