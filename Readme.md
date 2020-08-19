@@ -8,7 +8,7 @@ Sample program for sending/receiving queue and KEDA v2 Azure Storage Queue Trigg
 * Install Go lang (1.13+)
 * Docker
 
-## Set Enviornment Variables for the container
+## Set Environment Variables for the container
 
 | Key | Description |
 | ---- | ------ |
